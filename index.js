@@ -133,28 +133,43 @@ const testIncrementCounter = () => {
 // 		).toEqual(todoAfter);
 // };
 
+const todo = (state, action) => {
+	switch (action.type){
+		case 'ADD_TODO':
+			return 	{
+				id: action.id,
+				text: action.text,
+				completed: false
+			};
+		case 'TOGGLE_TODO':
+			if (state.id !== action.id){
+				return state;
+			}
+			return {
+				id: state['id'],
+				text: state['text'],
+				completed: !state.completed
+			};
+		default:
+			return state;
+	}
+};
+
+
+// handle 2 actions. 1. add todo 2. toggle todo.
+// makes 2 different concerns, how the todo array is upddated and how 
+// individual todo is updated. This is not a problem in redux
+// any time a function is doing too many things
+// We need to extract it 
 const todos = (state = [], action) => {
 	switch (action.type) {
 		case 'ADD_TODO':
 			return [
 				...state,
-				{
-					id: action.id,
-					text: action.text,
-					completed: false
-
-				}	
+				todo(undefined, action)
 			];
 		case 'TOGGLE_TODO':
-			return state.map(todo => {
-				if (todo.id !== action.id){
-					return todo;
-				}
-				return {
-					...todo,
-					completed: !todo.completed
-				};
-			});
+			return state.map(t => todo(t, action));		
 		default:
 			return state;
 	}
